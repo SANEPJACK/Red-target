@@ -51,3 +51,17 @@ C:\Users\Lenovo\Desktop\Red-target\Red-target\RedTarGet\obj\x86\Debug\RedTarGet.
 C:\Users\Lenovo\Desktop\Red-target\Red-target\RedTarGet\obj\x86\Debug\RedTarGet.csproj.CopyComplete
 C:\Users\Lenovo\Desktop\Red-target\Red-target\RedTarGet\obj\x86\Debug\RedTarGet.exe
 C:\Users\Lenovo\Desktop\Red-target\Red-target\RedTarGet\obj\x86\Debug\RedTarGet.pdb
+E:\12-Red-target\Red-target\RedTarGet\obj\x86\Debug\RedTarGet.csproj.AssemblyReference.cache
+E:\12-Red-target\Red-target\RedTarGet\obj\x86\Debug\RedTarGet.csproj.CoreCompileInputs.cache
+E:\12-Red-target\Red-target\RedTarGet\bin\Debug\System.CodeDom.dll
+E:\12-Red-target\Red-target\RedTarGet\bin\Debug\System.CodeDom.xml
+E:\12-Red-target\Red-target\RedTarGet\obj\x86\Debug\RedTarGet.csproj.CopyComplete
+E:\12-Red-target\Red-target\RedTarGet\bin\Debug\Red Skull.exe.config
+E:\12-Red-target\Red-target\RedTarGet\bin\Debug\Red Skull.exe.manifest
+E:\12-Red-target\Red-target\RedTarGet\bin\Debug\Red Skull.application
+E:\12-Red-target\Red-target\RedTarGet\bin\Debug\Red Skull.exe
+E:\12-Red-target\Red-target\RedTarGet\bin\Debug\Red Skull.pdb
+E:\12-Red-target\Red-target\RedTarGet\obj\x86\Debug\Red Skull.exe.manifest
+E:\12-Red-target\Red-target\RedTarGet\obj\x86\Debug\Red Skull.application
+E:\12-Red-target\Red-target\RedTarGet\obj\x86\Debug\Red Skull.exe
+E:\12-Red-target\Red-target\RedTarGet\obj\x86\Debug\Red Skull.pdb

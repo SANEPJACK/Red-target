@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using WebSocketClientLib;
+// using WebSocketClientLib;
 
 namespace RedPixelDetector
 {
@@ -50,27 +50,27 @@ namespace RedPixelDetector
 		private static void Main(string[] args)
 		{
 			Program.LoadSettings();
-			try
-			{
-				new Thread(delegate()
-				{
-					try
-					{
-						new WebSocketClient("RedTarGet").Start();
-					}
-					catch (Exception ex2)
-					{
-						Console.WriteLine("WebSocket Error: " + ex2.Message);
-					}
-				})
-				{
-					IsBackground = true
-				}.Start();
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine("Failed to start WebSocket: " + ex.Message);
-			}
+			// try
+			// {
+			// 	new Thread(delegate()
+			// 	{
+			// 		try
+			// 		{
+			// 			new WebSocketClient("RedTarGet").Start();
+			// 		}
+			// 		catch (Exception ex2)
+			// 		{
+			// 			Console.WriteLine("WebSocket Error: " + ex2.Message);
+			// 		}
+			// 	})
+			// 	{
+			// 		IsBackground = true
+			// 	}.Start();
+			// }
+			//catch (Exception ex)
+			//{
+			//	Console.WriteLine("Failed to start WebSocket: " + ex.Message);
+			//}
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 			Program.InitializeTrayIcon();
@@ -317,7 +317,7 @@ namespace RedPixelDetector
 			});
 			Program.trayIcon = new NotifyIcon
 			{
-				Text = "เป้าแดงแรงจริ๊งงง !!",
+				Text = "กระโหลกแดง 💀 (Red Skull)",
 				Icon = SystemIcons.Application,
 				ContextMenuStrip = Program.trayMenu,
 				Visible = false
@@ -336,7 +336,7 @@ namespace RedPixelDetector
 				Program.mainForm.Hide();
 				Program.trayIcon.Visible = true;
 				Program.isMinimizedToTray = true;
-				Program.trayIcon.ShowBalloonTip(1000, "เป้าแดงแรงจริ๊งงง !!", "โปรแกรมถูกซ่อนไว้ใน System Tray", ToolTipIcon.Info);
+				Program.trayIcon.ShowBalloonTip(1000, "กระโหลกแดง 💀 (Red Skull)", "โปรแกรมถูกซ่อนไว้ใน System Tray", ToolTipIcon.Info);
 			}
 		}
 
@@ -366,14 +366,15 @@ namespace RedPixelDetector
 
 			Program.mainForm = new Form
 			{
-				Text = "เป้าแดงแรงจริงง !!",
+				Text = "กระโหลกแดง 💀 (Red Skull)",
 				Size = new Size(560, 300),
 				StartPosition = FormStartPosition.CenterScreen,
 				FormBorderStyle = FormBorderStyle.FixedDialog,
 				MaximizeBox = false,
 				MinimizeBox = false,
 				BackColor = ColorTranslator.FromHtml("#4682B4"),
-				ForeColor = textColor
+				ForeColor = Color.Red,
+				Font = new Font("Segoe UI", 11, FontStyle.Bold) // ตัวหนา + สวยอ่านง่าย
 			};
 
 			// ==== Create Buttons ====
@@ -2637,14 +2638,27 @@ namespace RedPixelDetector
 					item3.Selected = true;
 				}
 			};
+
+			int btnWidth = 110;
+			int btnHeight = 32;
+			int bottomY = 300;
+
+			btnEdit.Size = new Size(btnWidth, btnHeight);
+			btnOk.Size = new Size(btnWidth, btnHeight);
+			btnCancel.Size = new Size(btnWidth, btnHeight);
+
+			btnEdit.Location = new Point(50, bottomY);
+			btnOk.Location = new Point(200, bottomY);
+			btnCancel.Location = new Point(350, bottomY);
+
 			form.Controls.AddRange(new Control[]
 			{
 				listView,
-				btnAdd,
+				//btnAdd,
 				btnEdit,
-				btnDelete,
-				btnMoveUp,
-				btnMoveDown,
+				//btnDelete,
+				//btnMoveUp,
+				//btnMoveDown,
 				btnOk,
 				btnCancel
 			});
@@ -3097,20 +3111,39 @@ namespace RedPixelDetector
 				break;
 			}
 			cmbValue.SelectedItem = action.Value;
+			//Label lblDelay = new Label
+			//{
+			//	Text = "ดีเลย์ (ms):",
+			//	Location = new Point(10, 80),
+			//	Size = new Size(70, 20)
+			//};
+			//NumericUpDown numDelay = new NumericUpDown
+			//{
+			//	Location = new Point(90, 78),
+			//	Size = new Size(100, 20),
+			//	Minimum = 0m,
+			//	Maximum = 5000m,
+			//	Value = action.DelayMs
+			//};
+
+			int centerX = (form.ClientSize.Width / 2);
+
 			Label lblDelay = new Label
 			{
 				Text = "ดีเลย์ (ms):",
-				Location = new Point(10, 80),
-				Size = new Size(70, 20)
+				AutoSize = true
 			};
+			lblDelay.Location = new Point(centerX - (lblDelay.PreferredWidth + 100) / 2, 60);
+
 			NumericUpDown numDelay = new NumericUpDown
 			{
-				Location = new Point(90, 78),
 				Size = new Size(100, 20),
 				Minimum = 0m,
 				Maximum = 5000m,
 				Value = action.DelayMs
 			};
+			numDelay.Location = new Point(centerX - numDelay.Width / 2, 80);
+
 			Button btnOk = new Button
 			{
 				Text = "ตกลง",
@@ -3136,15 +3169,45 @@ namespace RedPixelDetector
 			toolTip.SetToolTip(numDelay, "ระยะเวลารอหลังจากการกระทำ\n0-5000 มิลลิวินาที");
 			form.Controls.AddRange(new Control[]
 			{
-				lblType,
-				cmbType,
-				lblValue,
-				cmbValue,
+				//lblType,
+				//cmbType,
+				//lblValue,
+				//cmbValue,
 				lblDelay,
 				numDelay,
 				btnOk,
 				btnCancel
 			});
+
+			form.Shown += (s, e2) =>
+			{
+				// center delay label
+				lblDelay.Location = new Point(
+					(form.ClientSize.Width - lblDelay.Width) / 2,
+					60
+				);
+
+				// center numeric
+				numDelay.Location = new Point(
+					(form.ClientSize.Width - numDelay.Width) / 2,
+					80
+				);
+
+				// center buttons
+				int btnWidth = 90;
+				btnOk.Size = new Size(btnWidth, 30);
+				btnCancel.Size = new Size(btnWidth, 30);
+
+				btnOk.Location = new Point(
+					(form.ClientSize.Width / 2) - btnWidth - 5,
+					120
+				);
+
+				btnCancel.Location = new Point(
+					(form.ClientSize.Width / 2) + 5,
+					120
+				);
+			};
 			if (form.ShowDialog(parent) == DialogResult.OK)
 			{
 				ActionItem actionItem = action;

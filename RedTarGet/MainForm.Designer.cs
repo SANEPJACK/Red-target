@@ -7,7 +7,7 @@
 		private void InitializeComponent()
 		{
 			base.SuspendLayout();
-			this.Text = "เป้าแดง แรงจริ๊งงง !! \ud83c\udfaf\ud83d\udd34";
+			this.Text = "กระโหลกแดง 💀 (Red Skull)";
 			base.Size = new global::System.Drawing.Size(500, 320);
 			base.StartPosition = global::System.Windows.Forms.FormStartPosition.CenterScreen;
 			base.FormBorderStyle = global::System.Windows.Forms.FormBorderStyle.FixedDialog;
