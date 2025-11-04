@@ -1,0 +1,35 @@
+C:\Users\Lenovo\Desktop\New folder (2)\RedTarGet\bin\Debug\RedTarGet.exe.config
+C:\Users\Lenovo\Desktop\New folder (2)\RedTarGet\bin\Debug\RedTarGet.exe
+C:\Users\Lenovo\Desktop\New folder (2)\RedTarGet\bin\Debug\RedTarGet.pdb
+C:\Users\Lenovo\Desktop\New folder (2)\RedTarGet\bin\Debug\WebSocketClientLib.dll
+C:\Users\Lenovo\Desktop\New folder (2)\RedTarGet\bin\Debug\WebSocket4Net.dll
+C:\Users\Lenovo\Desktop\New folder (2)\RedTarGet\bin\Debug\SuperSocket.ClientEngine.dll
+C:\Users\Lenovo\Desktop\New folder (2)\RedTarGet\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Lenovo\Desktop\New folder (2)\RedTarGet\bin\Debug\WebSocketClientLib.pdb
+C:\Users\Lenovo\Desktop\New folder (2)\RedTarGet\obj\x86\Debug\RedTarGet.csproj.AssemblyReference.cache
+C:\Users\Lenovo\Desktop\New folder (2)\RedTarGet\obj\x86\Debug\RedTarGet.csproj.CoreCompileInputs.cache
+C:\Users\Lenovo\Desktop\New folder (2)\RedTarGet\obj\x86\Debug\RedTarGet.csproj.CopyComplete
+C:\Users\Lenovo\Desktop\New folder (2)\RedTarGet\obj\x86\Debug\RedTarGet.exe
+C:\Users\Lenovo\Desktop\New folder (2)\RedTarGet\obj\x86\Debug\RedTarGet.pdb
+C:\Users\Lenovo\Desktop\New folder (2)\RedTarGet\bin\Debug\RedTarGet.exe.manifest
+C:\Users\Lenovo\Desktop\New folder (2)\RedTarGet\bin\Debug\RedTarGet.application
+C:\Users\Lenovo\Desktop\New folder (2)\RedTarGet\obj\x86\Debug\RedTarGet.exe.manifest
+C:\Users\Lenovo\Desktop\New folder (2)\RedTarGet\obj\x86\Debug\RedTarGet.application
+C:\Users\Lenovo\Desktop\RedTarGet\RedTarGet\bin\Debug\RedTarGet.exe.config
+C:\Users\Lenovo\Desktop\RedTarGet\RedTarGet\bin\Debug\RedTarGet.exe.manifest
+C:\Users\Lenovo\Desktop\RedTarGet\RedTarGet\bin\Debug\RedTarGet.application
+C:\Users\Lenovo\Desktop\RedTarGet\RedTarGet\bin\Debug\RedTarGet.exe
+C:\Users\Lenovo\Desktop\RedTarGet\RedTarGet\bin\Debug\RedTarGet.pdb
+C:\Users\Lenovo\Desktop\RedTarGet\RedTarGet\bin\Debug\WebSocket4Net.dll
+C:\Users\Lenovo\Desktop\RedTarGet\RedTarGet\bin\Debug\SuperSocket.ClientEngine.dll
+C:\Users\Lenovo\Desktop\RedTarGet\RedTarGet\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Lenovo\Desktop\RedTarGet\RedTarGet\bin\Debug\WebSocketClientLib.pdb
+C:\Users\Lenovo\Desktop\RedTarGet\RedTarGet\obj\x86\Debug\RedTarGet.csproj.AssemblyReference.cache
+C:\Users\Lenovo\Desktop\RedTarGet\RedTarGet\obj\x86\Debug\RedTarGet.csproj.CoreCompileInputs.cache
+C:\Users\Lenovo\Desktop\RedTarGet\RedTarGet\obj\x86\Debug\RedTarGet.exe.manifest
+C:\Users\Lenovo\Desktop\RedTarGet\RedTarGet\obj\x86\Debug\RedTarGet.application
+C:\Users\Lenovo\Desktop\RedTarGet\RedTarGet\obj\x86\Debug\RedTarGet.csproj.CopyComplete
+C:\Users\Lenovo\Desktop\RedTarGet\RedTarGet\obj\x86\Debug\RedTarGet.exe
+C:\Users\Lenovo\Desktop\RedTarGet\RedTarGet\obj\x86\Debug\RedTarGet.pdb
+C:\Users\Lenovo\Desktop\RedTarGet\RedTarGet\bin\Debug\System.CodeDom.dll
+C:\Users\Lenovo\Desktop\RedTarGet\RedTarGet\bin\Debug\System.CodeDom.xml
