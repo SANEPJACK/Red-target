@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
@@ -10,9 +11,11 @@ using System.Xml.Serialization;
 
 namespace RedPixelDetector
 {
+	[Obfuscation(Exclude = true, ApplyToMembers = true)]
 	// Token: 0x02000007 RID: 7
 	internal class Program
 	{
+
 		// Token: 0x0600003F RID: 63
 		[DllImport("user32.dll")]
 		private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
@@ -153,7 +156,7 @@ namespace RedPixelDetector
 
 		private static void Checkuuid()
 		{
-			string allowed_uuid = "37616BCC-29F2-11B2-A85C-EB15EAAF6326ModeHC";
+			string allowed_uuid = "81006B9C-9588-0000-0000-000000000000ModeHC";
 			string current_uuid = LicenseManager.GetMachineUUID() + "ModeHC";
 
 			string current_uuid1 = LicenseManager.GetMachineUUID();
@@ -364,76 +367,194 @@ namespace RedPixelDetector
 			Color neutralColor = Color.FromArgb(108, 117, 125);
 			Color textColor = Color.FromArgb(34, 40, 49);
 
-			Program.mainForm = new Form
+		Color formBackgroundFallback = ColorTranslator.FromHtml("#4682B4");
+		Image formBackgroundImage = null;
+		string resourceName = "RedSkullShoot.Assets.background.png";
+		try
+		{
+			string[] manifestResources = Assembly.GetExecutingAssembly().GetManifestResourceNames();
+			foreach (string candidate in manifestResources)
 			{
-				Text = "กระโหลกแดง 💀 (Red Skull)",
-				Size = new Size(560, 300),
-				StartPosition = FormStartPosition.CenterScreen,
-				FormBorderStyle = FormBorderStyle.FixedDialog,
-				MaximizeBox = false,
-				MinimizeBox = false,
-				BackColor = ColorTranslator.FromHtml("#4682B4"),
-				ForeColor = Color.Red,
-				Font = new Font("Segoe UI", 11, FontStyle.Bold) // ตัวหนา + สวยอ่านง่าย
-			};
+				if (candidate.EndsWith("Assets.background.png", StringComparison.OrdinalIgnoreCase))
+				{
+					resourceName = candidate;
+					break;
+				}
+			}
+			using (Stream manifestResourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName))
+			{
+				if (manifestResourceStream != null)
+				{
+					formBackgroundImage = new Bitmap(manifestResourceStream);
+				}
+				else
+				{
+					Console.WriteLine("Embedded background not found: " + resourceName);
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine("Failed to load embedded background image: " + ex.Message);
+		}
 
-			// ==== Create Buttons ====
-			Program.btnStart = new Button { Text = "เริ่มทำงาน", Dock = DockStyle.Fill, BackColor = successColor, ForeColor = Color.White, FlatStyle = FlatStyle.Flat, Font = new Font("Segoe UI Semibold", 10f), Cursor = Cursors.Hand };
-			Program.btnStop = new Button { Text = "หยุดทำงาน", Dock = DockStyle.Fill, BackColor = dangerColor, ForeColor = Color.White, FlatStyle = FlatStyle.Flat, Font = new Font("Segoe UI Semibold", 10f), Cursor = Cursors.Hand, Enabled = false };
-			Program.btnSettings = new Button { Text = "การตั้งค่า", Dock = DockStyle.Fill, BackColor = accentColor, ForeColor = Color.White, FlatStyle = FlatStyle.Flat, Font = new Font("Segoe UI Semibold", 10f), Cursor = Cursors.Hand };
-			Button btnMinimizeToTray = new Button { Text = "ย่อโปรแกรม", Dock = DockStyle.Fill, BackColor = Color.FromArgb(100, 100, 140), ForeColor = Color.White, FlatStyle = FlatStyle.Flat, Font = new Font("Segoe UI", 9f), Cursor = Cursors.Hand };
-			Program.btnExit = new Button { Text = "ออก", Dock = DockStyle.Fill, BackColor = neutralColor, ForeColor = Color.White, FlatStyle = FlatStyle.Flat, Font = new Font("Segoe UI Semibold", 10f), Cursor = Cursors.Hand };
+		Program.mainForm = new Form
+		{
+			Text = "กระโหลกแดง \uD83D\uDC80 (Red Skull)",
+			Size = new Size(550, 470),
+			StartPosition = FormStartPosition.CenterScreen,
+			FormBorderStyle = FormBorderStyle.FixedDialog,
+			MaximizeBox = false,
+			MinimizeBox = false,
+			BackColor = (formBackgroundImage == null) ? formBackgroundFallback : Color.Black,
+			BackgroundImage = formBackgroundImage,
+			BackgroundImageLayout = ImageLayout.Zoom,
+			ForeColor = Color.Red,
+			Font = new Font("Segoe UI", 11, FontStyle.Bold)
+		};
 
-			// ==== Layout ====
-			TableLayoutPanel mainLayout = new TableLayoutPanel { Dock = DockStyle.Fill, Padding = new Padding(28), ColumnCount = 1, BackColor = ColorTranslator.FromHtml("#4682B4") };
-			mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize)); // top buttons
-			mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize)); // status
-			mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize)); // bottom buttons
+		// ==== Create Buttons ====
+		Program.btnStart = new Button { Text = "เริ่มทำงาน", Dock = DockStyle.Fill, BackColor = successColor, ForeColor = Color.White, FlatStyle = FlatStyle.Flat, Font = new Font("Segoe UI Semibold", 10f), Cursor = Cursors.Hand };
+		Program.btnStop = new Button { Text = "หยุดทำงาน", Dock = DockStyle.Fill, BackColor = dangerColor, ForeColor = Color.White, FlatStyle = FlatStyle.Flat, Font = new Font("Segoe UI Semibold", 10f), Cursor = Cursors.Hand, Enabled = false };
+		Program.btnSettings = new Button { Text = "การตั้งค่า", Dock = DockStyle.Fill, BackColor = accentColor, ForeColor = Color.White, FlatStyle = FlatStyle.Flat, Font = new Font("Segoe UI Semibold", 10f), Cursor = Cursors.Hand };
+		Button btnMinimizeToTray = new Button { Text = "ย่อโปรแกรม", Dock = DockStyle.Fill, BackColor = Color.FromArgb(100, 100, 140), ForeColor = Color.White, FlatStyle = FlatStyle.Flat, Font = new Font("Segoe UI", 9f), Cursor = Cursors.Hand };
+		Program.btnExit = new Button { Text = "ออก", Dock = DockStyle.Fill, BackColor = neutralColor, ForeColor = Color.White, FlatStyle = FlatStyle.Flat, Font = new Font("Segoe UI Semibold", 10f), Cursor = Cursors.Hand };
 
-			// ==== Top Button Bar ====
-			TableLayoutPanel topButtonsPanel = new TableLayoutPanel { Dock = DockStyle.Top, AutoSize = true, ColumnCount = 3 };
-			topButtonsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33f));
-			topButtonsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33f));
-			topButtonsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33f));
+		// ==== Layout ====
+		TableLayoutPanel mainLayout = new TableLayoutPanel
+		{
+			AutoSize = true,
+			AutoSizeMode = AutoSizeMode.GrowAndShrink,
+			Dock = DockStyle.Fill,
+			Padding = new Padding(60, 80, 60, 28),
+			Margin = new Padding(0),
+			ColumnCount = 1,
+			BackColor = (formBackgroundImage == null) ? formBackgroundFallback : Color.Transparent
+		};
+		mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+		mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+		mainLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
-			topButtonsPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 44f));
+		// ==== Top Button Bar ====
+		TableLayoutPanel topButtonsPanel = new TableLayoutPanel { Dock = DockStyle.Top, AutoSize = true, ColumnCount = 3, Margin = new Padding(0, 0, 0, 18) };
+		topButtonsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33f));
+		topButtonsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33f));
+		topButtonsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33.33f));
+		topButtonsPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 44f));
+		topButtonsPanel.Controls.Add(Program.btnStart, 0, 0);
+		topButtonsPanel.Controls.Add(Program.btnStop, 1, 0);
+		topButtonsPanel.Controls.Add(Program.btnSettings, 2, 0);
+		mainLayout.Controls.Add(topButtonsPanel);
 
-			topButtonsPanel.Controls.Add(Program.btnStart, 0, 0);
-			topButtonsPanel.Controls.Add(Program.btnStop, 1, 0);
-			topButtonsPanel.Controls.Add(Program.btnSettings, 2, 0);
-			mainLayout.Controls.Add(topButtonsPanel);
+		// ==== Status Card ====
+		TransparentPanel statusCard = new TransparentPanel
+		{
+			Dock = DockStyle.Top,
+			AutoSize = true,
+			BackColor = Color.FromArgb(235, 255, 255, 255),
+			Padding = new Padding(24, 20, 24, 18),
+			Margin = new Padding(0, 0, 0, 18),
+			BorderStyle = BorderStyle.FixedSingle
+		};
+		Label statusHeading = new Label
+		{
+			Text = "สถานะระบบ",
+			Dock = DockStyle.Top,
+			Height = 30,
+			Font = new Font("Segoe UI Semibold", 12f, FontStyle.Bold),
+			ForeColor = accentColor,
+			TextAlign = ContentAlignment.MiddleCenter,
+			BackColor = Color.Transparent,
+			Margin = new Padding(0, 0, 0, 8)
+		};
+		Panel statusDivider = new Panel { Dock = DockStyle.Top, Height = 2, BackColor = primaryColor, Margin = new Padding(0, 0, 0, 12) };
+		Program.lblToggleStatus = new Label
+		{
+			Text = "สถานะ ยิง / หยุด : ยังไม่มีการตั้งค่า",
+			AutoSize = false,
+			Height = 26,
+			Font = new Font("Segoe UI Semibold", 10f),
+			ForeColor = Color.Black,
+			TextAlign = ContentAlignment.MiddleCenter,
+			Dock = DockStyle.Top,
+			Visible = false,
+			BackColor = Color.Transparent,
+			Margin = new Padding(0, 2, 0, 0)
+		};
+		Program.lblStatus = new Label
+		{
+			Text = "สถานะ: หยุดทำงาน",
+			AutoSize = false,
+			Height = 26,
+			Font = new Font("Segoe UI", 10f),
+			ForeColor = Color.Green,
+			TextAlign = ContentAlignment.MiddleCenter,
+			Dock = DockStyle.Top,
+			BackColor = Color.Transparent,
+			Margin = new Padding(0, 2, 0, 0)
+		};
+		Program.lblCountdown = new Label
+		{
+			Text = "กำลังโหลด...",
+			AutoSize = false,
+			Height = 26,
+			Font = new Font("Segoe UI Semibold", 10f),
+			ForeColor = Color.DarkGreen,
+			TextAlign = ContentAlignment.MiddleCenter,
+			Dock = DockStyle.Top,
+			BackColor = Color.Transparent,
+			Margin = new Padding(0, 2, 0, 0)
+		};
+		Program.lblCountdown1 = new Label
+		{
+			Text = "กำลังโหลด...",
+			AutoSize = false,
+			Height = 26,
+			Font = new Font("Segoe UI Semibold", 10f),
+			ForeColor = Color.DarkGreen,
+			TextAlign = ContentAlignment.MiddleCenter,
+			Dock = DockStyle.Top,
+			BackColor = Color.Transparent,
+			Margin = new Padding(0, 2, 0, 0)
+		};
+		statusCard.Controls.Add(Program.lblCountdown1);
+		statusCard.Controls.Add(Program.lblCountdown);
+		statusCard.Controls.Add(Program.lblStatus);
+		statusCard.Controls.Add(Program.lblToggleStatus);
+		statusCard.Controls.Add(statusDivider);
+		statusCard.Controls.Add(statusHeading);
+		mainLayout.Controls.Add(statusCard);
 
-			// ==== Status Card ====
-			Panel statusCard = new Panel { Dock = DockStyle.Top, AutoSize = true, BackColor = Color.White, Padding = new Padding(20, 18, 20, 18), Margin = new Padding(0, 0, 0, 18), BorderStyle = BorderStyle.FixedSingle };
-			Label statusHeading = new Label { Text = "สถานะระบบ", Dock = DockStyle.Top, Font = new Font("Segoe UI Semibold", 11f, FontStyle.Bold), ForeColor = accentColor, TextAlign = ContentAlignment.MiddleCenter };
-			Panel statusDivider = new Panel { Dock = DockStyle.Top, Height = 2, BackColor = primaryColor, Margin = new Padding(0, 12, 0, 12) };
+		// ==== Bottom Buttons Panel ====
+		TableLayoutPanel bottomButtonsPanel = new TableLayoutPanel
+		{
+			Dock = DockStyle.Top,
+			AutoSize = true,
+			ColumnCount = 1,
+			Margin = new Padding(0),
+			BackColor = Color.Transparent
+		};
+		bottomButtonsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50f));
+		bottomButtonsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50f));
+		bottomButtonsPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 40f));
+		// bottomButtonsPanel.Controls.Add(btnMinimizeToTray, 0, 0);
+		bottomButtonsPanel.Controls.Add(Program.btnExit, 1, 0);
+		mainLayout.Controls.Add(bottomButtonsPanel);
 
-			Program.lblToggleStatus = new Label { Text = "สถานะ เปิด / ปิด : ไม่ใช้งาน", AutoSize = true, Font = new Font("Segoe UI Semibold", 10f), ForeColor = Color.Black, TextAlign = ContentAlignment.MiddleCenter, Dock = DockStyle.Top, Visible = false };
-			Program.lblStatus = new Label { Text = "สถานะ: หยุดทำงาน", AutoSize = true, Font = new Font("Segoe UI", 10f), ForeColor = Color.Green, TextAlign = ContentAlignment.MiddleCenter, Dock = DockStyle.Top };
-			Program.lblCountdown = new Label { Text = "กำลังโหลด...", AutoSize = true, Font = new Font("Segoe UI Semibold", 10f), ForeColor = Color.DarkGreen, TextAlign = ContentAlignment.MiddleCenter, Dock = DockStyle.Top };
-			Program.lblCountdown1 = new Label { Text = "กำลังโหลด...", AutoSize = true, Font = new Font("Segoe UI Semibold", 10f), ForeColor = Color.DarkGreen, TextAlign = ContentAlignment.MiddleCenter, Dock = DockStyle.Top };
-
-			statusCard.Controls.Add(Program.lblCountdown1);
-			statusCard.Controls.Add(Program.lblCountdown);
-			statusCard.Controls.Add(Program.lblStatus);
-			statusCard.Controls.Add(Program.lblToggleStatus);
-			statusCard.Controls.Add(statusDivider);
-			statusCard.Controls.Add(statusHeading);
-			mainLayout.Controls.Add(statusCard);
-
-			// ==== Bottom Buttons Panel ====
-			TableLayoutPanel bottomButtonsPanel = new TableLayoutPanel { Dock = DockStyle.Top, AutoSize = true, ColumnCount = 1 };
-			bottomButtonsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50f));
-			bottomButtonsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50f));
-
-			bottomButtonsPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 33f));
-
-			// ย่อโปรแกรม จะเปิด ต้อง ColumnCount = 2 ใน  Bottom Buttons Panel
-			//bottomButtonsPanel.Controls.Add(btnMinimizeToTray, 0, 0);
-			bottomButtonsPanel.Controls.Add(Program.btnExit, 1, 0);
-			mainLayout.Controls.Add(bottomButtonsPanel);
-
-			Program.mainForm.Controls.Add(mainLayout);
+		Panel mainContentHost = new Panel { Dock = DockStyle.Fill, BackColor = Color.Transparent };
+		mainContentHost.Controls.Add(mainLayout);
+		mainLayout.Location = Point.Empty;
+		Action centerMainLayout = null;
+		centerMainLayout = delegate
+		{
+			int offsetX = Math.Max(0, (mainContentHost.ClientSize.Width - mainLayout.Width) / 2);
+			int offsetY = Math.Max(0, (mainContentHost.ClientSize.Height - mainLayout.Height) / 2);
+			mainLayout.Location = new Point(offsetX, offsetY);
+		};
+		mainContentHost.Resize += (s, e) => centerMainLayout();
+		Program.mainForm.Shown += (s, e) => centerMainLayout();
+		centerMainLayout();
+		Program.mainForm.Controls.Add(mainContentHost);
 
 			// ==== Events & Tooltips ====
 			//ToolTip toolTip = new ToolTip();
@@ -755,6 +876,32 @@ namespace RedPixelDetector
 		// Token: 0x06000059 RID: 89
 		private static void ShowSettingsDialog()
 		{
+			Image formBackgroundImage = null;
+			string resourceName = "RedSkullShoot.Assets.background.png";
+
+			try
+			{
+				string[] manifestResources = Assembly.GetExecutingAssembly().GetManifestResourceNames();
+				foreach (string candidate in manifestResources)
+				{
+					if (candidate.EndsWith("Assets.background.png", StringComparison.OrdinalIgnoreCase))
+					{
+						resourceName = candidate;
+						break;
+					}
+				}
+
+				using (Stream manifestResourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName))
+				{
+					if (manifestResourceStream != null)
+					{
+						formBackgroundImage = new Bitmap(manifestResourceStream);
+					}
+				}
+			}
+			catch { }
+
+
 			Form form = new Form
 			{
 				Text = "ตั้งค่าการทำงาน",
@@ -764,7 +911,9 @@ namespace RedPixelDetector
 				MaximizeBox = false,
 				MinimizeBox = false,
 				//BackColor = Color.FromArgb(45, 45, 65),
-				BackColor = ColorTranslator.FromHtml("#4682B4"),
+				BackColor = (formBackgroundImage == null) ? ColorTranslator.FromHtml("#4682B4") : Color.Black,
+				BackgroundImage = formBackgroundImage,
+				BackgroundImageLayout = ImageLayout.Zoom,
 				ForeColor = Color.White
 			};
 			Panel mainPanel = new Panel
@@ -772,7 +921,7 @@ namespace RedPixelDetector
 				Dock = DockStyle.Fill,
 				AutoScroll = true,
 				//BackColor = Color.FromArgb(60, 60, 80),
-				BackColor = ColorTranslator.FromHtml("#4682B4"),
+				BackColor = Color.Transparent,
 				Padding = new Padding(10)
 			};
 			int currentY = 20;
@@ -781,7 +930,7 @@ namespace RedPixelDetector
 				Text = "เลือก ขนาดหน้าจอ :",
 				AutoSize = false,
 				Size = new Size(320, 20),
-				ForeColor = Color.Black,
+				ForeColor = Color.White,
 				Font = new Font("Microsoft Sans Serif", 9f, FontStyle.Bold),
 				TextAlign = ContentAlignment.MiddleCenter
 			};
@@ -828,7 +977,7 @@ namespace RedPixelDetector
 				Text = "โหมดอัตโนมัติ",
 				AutoSize = true,
 				Checked = Program.autoMode,
-				ForeColor = Color.Black,
+				ForeColor = Color.White,
 				Font = new Font("Microsoft Sans Serif", 9f),
 				Margin = new Padding(0, 0, 20, 0)
 			};
@@ -837,7 +986,7 @@ namespace RedPixelDetector
 				Text = "โหมดกดปุ่มสลับ เปิด/ปิด",
 				AutoSize = true,
 				Checked = Program.toggleMode,
-				ForeColor = Color.Black,
+				ForeColor = Color.White,
 				Font = new Font("Microsoft Sans Serif", 9f),
 				Margin = new Padding(0)
 			};
@@ -862,7 +1011,7 @@ namespace RedPixelDetector
 				Text = "เลือก โหมดการยิง:",
 				AutoSize = false,
 				Size = new Size(320, 20),
-				ForeColor = Color.Black,
+				ForeColor = Color.White,
 				Font = new Font("Microsoft Sans Serif", 9f, FontStyle.Bold),
 				TextAlign = ContentAlignment.MiddleCenter
 			};
@@ -870,7 +1019,7 @@ namespace RedPixelDetector
 			{
 				Text = "ยิงอัตโนมัติ",
 				AutoSize = true,
-				ForeColor = Color.Black,
+				ForeColor = Color.White,
 				Font = new Font("Microsoft Sans Serif", 9f),
 				Margin = new Padding(0, 0, 20, 0)
 			};
@@ -878,7 +1027,7 @@ namespace RedPixelDetector
 			{
 				Text = "ลูกซอง",
 				AutoSize = true,
-				ForeColor = Color.Black,
+				ForeColor = Color.White,
 				Font = new Font("Microsoft Sans Serif", 9f),
 				Margin = new Padding(0, 0, 20, 0)
 			};
@@ -886,7 +1035,7 @@ namespace RedPixelDetector
 			{
 				Text = "สไนเปอร์",
 				AutoSize = true,
-				ForeColor = Color.Black,
+				ForeColor = Color.White,
 				Font = new Font("Microsoft Sans Serif", 9f),
 				Margin = new Padding(0, 0, 20, 0)
 			};
@@ -894,7 +1043,7 @@ namespace RedPixelDetector
 			{
 				Text = "ตั้งค่า ดีเลย์ กำหนดเอง",
 				AutoSize = true,
-				ForeColor = Color.Black,
+				ForeColor = Color.White,
 				Font = new Font("Microsoft Sans Serif", 9f),
 				Margin = new Padding(0)
 			};
@@ -923,7 +1072,7 @@ namespace RedPixelDetector
 				AutoSize = true,
 				Checked = Program.holdToActivate,
 				Enabled = !Program.autoMode,
-				ForeColor = Color.Black,
+				ForeColor = Color.White,
 				Font = new Font("Microsoft Sans Serif", 9f),
 				Location = new Point(settingsLeft, currentY)
 			};
@@ -935,7 +1084,7 @@ namespace RedPixelDetector
 				AutoSize = true,
 				Checked = Program.useMouse,
 				Enabled = !Program.autoMode,
-				ForeColor = Color.Black,
+				ForeColor = Color.White,
 				Font = new Font("Microsoft Sans Serif", 9f),
 				Location = new Point(settingsLeft, currentY)
 			};
@@ -953,7 +1102,7 @@ namespace RedPixelDetector
 				AutoSize = true,
 				Checked = Program.useKeyboard,
 				Enabled = !Program.autoMode,
-				ForeColor = Color.Black,
+				ForeColor = Color.White,
 				Font = new Font("Microsoft Sans Serif", 9f),
 				Location = new Point(settingsLeft, currentY)
 			};
@@ -969,7 +1118,7 @@ namespace RedPixelDetector
 			{
 				Text = "ขนาด FOV:",
 				AutoSize = true,
-				ForeColor = Color.Black,
+				ForeColor = Color.White,
 				Location = new Point(settingsLeft, currentY)
 			};
 			NumericUpDown numFov = new NumericUpDown
@@ -2488,13 +2637,41 @@ namespace RedPixelDetector
 		// Token: 0x0600005D RID: 93 แก้ไขลำดับการทำงาน
 		private static void ShowActionSequenceDialog(Form parentForm)
 		{
+
+			Image formBackgroundImage = null;
+			string resourceName = "RedSkullShoot.Assets.background.png";
+
+			try
+			{
+				string[] manifestResources = Assembly.GetExecutingAssembly().GetManifestResourceNames();
+				foreach (string candidate in manifestResources)
+				{
+					if (candidate.EndsWith("Assets.background.png", StringComparison.OrdinalIgnoreCase))
+					{
+						resourceName = candidate;
+						break;
+					}
+				}
+
+				using (Stream manifestResourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName))
+				{
+					if (manifestResourceStream != null)
+					{
+						formBackgroundImage = new Bitmap(manifestResourceStream);
+					}
+				}
+			}
+			catch { }
+
 			Form form = new Form
 			{
 				Text = "แก้ไข ดีเลย์ การทำงาน",
 				Size = new Size(540, 400),
 				StartPosition = FormStartPosition.CenterScreen,
 				FormBorderStyle = FormBorderStyle.FixedDialog,
-				BackColor = ColorTranslator.FromHtml("#4682B4"),
+				BackColor = (formBackgroundImage == null) ? ColorTranslator.FromHtml("#4682B4") : Color.Black,
+				BackgroundImage = formBackgroundImage,
+				BackgroundImageLayout = ImageLayout.Zoom,
 				ForeColor = Color.White
 			};
 			Panel panel = new Panel();
@@ -2677,6 +2854,7 @@ namespace RedPixelDetector
 		// Token: 0x0600005E RID: 94 เพิ่มการกระทำ
 		private static void AddActionItem(Form parent, ListView listView)
 		{
+
 			Form form = new Form
 			{
 				Text = "เพิ่มการกระทำ",
@@ -2913,6 +3091,32 @@ namespace RedPixelDetector
 		// Token: 0x0600005F RID: 95 แก้ไขดีเลย์
 		private static void EditActionItem(Form parent, ListView listView)
 		{
+
+			Image formBackgroundImage = null;
+			string resourceName = "RedSkullShoot.Assets.background.png";
+
+			try
+			{
+				string[] manifestResources = Assembly.GetExecutingAssembly().GetManifestResourceNames();
+				foreach (string candidate in manifestResources)
+				{
+					if (candidate.EndsWith("Assets.background.png", StringComparison.OrdinalIgnoreCase))
+					{
+						resourceName = candidate;
+						break;
+					}
+				}
+
+				using (Stream manifestResourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName))
+				{
+					if (manifestResourceStream != null)
+					{
+						formBackgroundImage = new Bitmap(manifestResourceStream);
+					}
+				}
+			}
+			catch { }
+
 			if (listView.SelectedItems.Count == 0)
 			{
 				return;
@@ -2924,7 +3128,9 @@ namespace RedPixelDetector
 				Text = "แก้ไข ดีเลย์",
 				Size = new Size(300, 200),
 				StartPosition = FormStartPosition.CenterParent,
-				BackColor = ColorTranslator.FromHtml("#4682B4"),
+				BackColor = (formBackgroundImage == null) ? ColorTranslator.FromHtml("#4682B4") : Color.Black,
+				BackgroundImage = formBackgroundImage,
+				BackgroundImageLayout = ImageLayout.Zoom,
 				ShowIcon = false, // ✅ ซ่อนไอคอน
 				FormBorderStyle = FormBorderStyle.FixedDialog, // ✅ ทำให้ไม่มีไอคอน
 				MaximizeBox = false // ไม่ให้ขยายหน้าต่าง
@@ -3131,6 +3337,7 @@ namespace RedPixelDetector
 			Label lblDelay = new Label
 			{
 				Text = "ดีเลย์ (ms):",
+				ForeColor = Color.White,
 				AutoSize = true
 			};
 			lblDelay.Location = new Point(centerX - (lblDelay.PreferredWidth + 100) / 2, 60);
@@ -4312,6 +4519,26 @@ namespace RedPixelDetector
 
 		// Token: 0x040000A4 RID: 164
 		private static readonly string settingsFilePath = Path.Combine(Path.GetTempPath(), "Settings.xml");
+		private class TransparentPanel : Panel
+		{
+			public TransparentPanel()
+			{
+				SetStyle(ControlStyles.SupportsTransparentBackColor, true);
+			}
+
+			protected override void OnPaintBackground(PaintEventArgs e)
+			{
+				if (BackColor.A > 0)
+				{
+					using (Brush brush = new SolidBrush(BackColor))
+					{
+						e.Graphics.FillRectangle(brush, ClientRectangle);
+					}
+					return;
+				}
+				base.OnPaintBackground(e);
+			}
+		}
 
 		// Token: 0x02000008 RID: 8
 		public struct RECT
@@ -4330,5 +4557,3 @@ namespace RedPixelDetector
 		}
 	}
 }
-
-

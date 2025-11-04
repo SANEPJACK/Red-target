@@ -31,14 +31,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Red Skull.exe" size="148968">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Red Skull.exe" size="410088">
       <assemblyIdentity name="Red Skull" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>eo9uQPUuZLVugM5GzFp83xPMJa8xD3AvozJ+Ex5KOYA=</dsig:DigestValue>
+        <dsig:DigestValue>KtQisyJsKyiom7vHSDcIE3FpWT6XUn/i09pp6tVbmBA=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
