@@ -43,14 +43,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="RedTarGet.exe" size="148968">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="RedTarGet.exe" size="148456">
       <assemblyIdentity name="RedTarGet" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>eDNrsGLOOrpZA/OIC0VNqNvDrOjcc0AUW2VCFQ02IKo=</dsig:DigestValue>
+        <dsig:DigestValue>tKNMmhR7H8uT3BkGGjdsC310Bn5T/OBcr+n9RAltyZw=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

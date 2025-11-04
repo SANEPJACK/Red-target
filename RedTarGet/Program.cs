@@ -153,7 +153,7 @@ namespace RedPixelDetector
 
 		private static void Checkuuid()
 		{
-			string allowed_uuid = "035E02D8-04D3-054B-6F06-7E0700080009ModeHC";
+			string allowed_uuid = "37616BCC-29F2-11B2-A85C-EB15EAAF6326ModeHC";
 			string current_uuid = LicenseManager.GetMachineUUID() + "ModeHC";
 
 			string current_uuid1 = LicenseManager.GetMachineUUID();
