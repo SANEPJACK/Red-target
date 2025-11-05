@@ -1,0 +1,7 @@
+C:\Users\Lenovo\Desktop\Red-Skull\RedFull\bin\Debug\RedSkull.exe.config
+C:\Users\Lenovo\Desktop\Red-Skull\RedFull\bin\Debug\RedSkull.exe
+C:\Users\Lenovo\Desktop\Red-Skull\RedFull\bin\Debug\RedSkull.pdb
+C:\Users\Lenovo\Desktop\Red-Skull\RedFull\obj\x86\Debug\RedSkull.csproj.CoreCompileInputs.cache
+C:\Users\Lenovo\Desktop\Red-Skull\RedFull\obj\x86\Debug\RedSkull.exe
+C:\Users\Lenovo\Desktop\Red-Skull\RedFull\obj\x86\Debug\RedSkull.pdb
+C:\Users\Lenovo\Desktop\Red-Skull\RedFull\obj\x86\Debug\RedSkull.csproj.AssemblyReference.cache
