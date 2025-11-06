@@ -967,6 +967,44 @@ namespace RedSkullShoot
 				Font = new Font("Microsoft Sans Serif", 9f),
 				Margin = new Padding(0)
 			};
+			Color modeButtonDefault = Color.FromArgb(45, 45, 65);
+			Color modeButtonActive = Color.FromArgb(0, 123, 255);
+			Color shootingButtonDefault = modeButtonDefault;
+			Color shootingButtonActive = modeButtonActive;
+			Button btnAutoModeToggle = new Button
+			{
+				Text = chkAutoMode.Text,
+				Size = new Size(150, 32),
+				FlatStyle = FlatStyle.Flat,
+				ForeColor = Color.White,
+				BackColor = modeButtonDefault,
+				Margin = new Padding(0, 0, 20, 0),
+				Cursor = Cursors.Hand
+			};
+			btnAutoModeToggle.FlatAppearance.BorderSize = 0;
+			btnAutoModeToggle.FlatAppearance.MouseOverBackColor = modeButtonActive;
+			btnAutoModeToggle.FlatAppearance.MouseDownBackColor = modeButtonActive;
+			Button btnToggleModeToggle = new Button
+			{
+				Text = chkToggleMode.Text,
+				Size = new Size(180, 32),
+				FlatStyle = FlatStyle.Flat,
+				ForeColor = Color.White,
+				BackColor = modeButtonDefault,
+				Margin = new Padding(0),
+				Cursor = Cursors.Hand
+			};
+			btnToggleModeToggle.FlatAppearance.BorderSize = 0;
+			btnToggleModeToggle.FlatAppearance.MouseOverBackColor = modeButtonActive;
+			btnToggleModeToggle.FlatAppearance.MouseDownBackColor = modeButtonActive;
+			Button btnUseMouseToggle = null;
+			Button btnUseKeyboardToggle = null;
+			Button btnAutoShootToggle = null;
+			Button btnShotgunToggle = null;
+			Button btnSniperScopeToggle = null;
+			Button btnManualModeToggle = null;
+			CheckBox chkUseMouse = null;
+			CheckBox chkUseKeyboard = null;
 			int centerX = mainPanel.ClientSize.Width / 2;
 			FlowLayoutPanel activationModeLayout = new FlowLayoutPanel
 			{
@@ -977,12 +1015,65 @@ namespace RedSkullShoot
 				Margin = new Padding(0),
 				Padding = new Padding(0)
 			};
-			activationModeLayout.Controls.Add(chkAutoMode);
-			activationModeLayout.Controls.Add(chkToggleMode);
+			activationModeLayout.Controls.Add(btnAutoModeToggle);
+			activationModeLayout.Controls.Add(btnToggleModeToggle);
 			activationModeLayout.PerformLayout();
 			Size activationSize = activationModeLayout.PreferredSize;
 			activationModeLayout.Location = new Point(Math.Max(centerX - activationSize.Width / 2, 20), currentY);
 			currentY = activationModeLayout.Bottom + 16;
+			CheckBox chkAutoShoot = new CheckBox();
+			CheckBox chkSniperNoScope = new CheckBox();
+			CheckBox chkSniperScope = new CheckBox();
+			CheckBox chkManualMode = new CheckBox();
+			Action updateModeButtonStates = null;
+			updateModeButtonStates = delegate
+			{
+				btnAutoModeToggle.BackColor = chkAutoMode.Checked ? modeButtonActive : modeButtonDefault;
+				btnToggleModeToggle.BackColor = chkToggleMode.Checked ? modeButtonActive : modeButtonDefault;
+				btnAutoModeToggle.Enabled = chkAutoMode.Enabled;
+				btnToggleModeToggle.Enabled = chkToggleMode.Enabled;
+				if (btnUseMouseToggle != null && chkUseMouse != null)
+				{
+					btnUseMouseToggle.BackColor = chkUseMouse.Checked ? shootingButtonActive : shootingButtonDefault;
+					btnUseMouseToggle.Enabled = chkUseMouse.Enabled;
+					btnUseMouseToggle.ForeColor = btnUseMouseToggle.Enabled ? Color.White : Color.FromArgb(170, 170, 170);
+				}
+				if (btnUseKeyboardToggle != null && chkUseKeyboard != null)
+				{
+					btnUseKeyboardToggle.BackColor = chkUseKeyboard.Checked ? shootingButtonActive : shootingButtonDefault;
+					btnUseKeyboardToggle.Enabled = chkUseKeyboard.Enabled;
+					btnUseKeyboardToggle.ForeColor = btnUseKeyboardToggle.Enabled ? Color.White : Color.FromArgb(170, 170, 170);
+				}
+				if (btnAutoShootToggle != null)
+				{
+					btnAutoShootToggle.BackColor = chkAutoShoot.Checked ? shootingButtonActive : shootingButtonDefault;
+					btnShotgunToggle.BackColor = chkSniperNoScope.Checked ? shootingButtonActive : shootingButtonDefault;
+					btnSniperScopeToggle.BackColor = chkSniperScope.Checked ? shootingButtonActive : shootingButtonDefault;
+					btnManualModeToggle.BackColor = chkManualMode.Checked ? shootingButtonActive : shootingButtonDefault;
+					btnAutoShootToggle.Enabled = chkAutoShoot.Enabled;
+					btnShotgunToggle.Enabled = chkSniperNoScope.Enabled;
+					btnSniperScopeToggle.Enabled = chkSniperScope.Enabled;
+					btnManualModeToggle.Enabled = chkManualMode.Enabled;
+				}
+			};
+			btnAutoModeToggle.Click += delegate (object s, EventArgs e)
+			{
+				if (!btnAutoModeToggle.Enabled)
+				{
+					return;
+				}
+				chkAutoMode.Checked = !chkAutoMode.Checked;
+				updateModeButtonStates();
+			};
+			btnToggleModeToggle.Click += delegate (object s, EventArgs e)
+			{
+				if (!btnToggleModeToggle.Enabled)
+				{
+					return;
+				}
+				chkToggleMode.Checked = !chkToggleMode.Checked;
+				updateModeButtonStates();
+			};
 			Label lblNewModes = new Label
 			{
 				Text = "เลือก โหมดการยิง:",
@@ -992,7 +1083,7 @@ namespace RedSkullShoot
 				Font = new Font("Microsoft Sans Serif", 9f, FontStyle.Bold),
 				TextAlign = ContentAlignment.MiddleCenter
 			};
-			CheckBox chkAutoShoot = new CheckBox
+			chkAutoShoot = new CheckBox
 			{
 				Text = "ยิงอัตโนมัติ",
 				AutoSize = true,
@@ -1000,7 +1091,7 @@ namespace RedSkullShoot
 				Font = new Font("Microsoft Sans Serif", 9f),
 				Margin = new Padding(0, 0, 20, 0)
 			};
-			CheckBox chkSniperNoScope = new CheckBox
+			chkSniperNoScope = new CheckBox
 			{
 				Text = "ลูกซอง",
 				AutoSize = true,
@@ -1008,7 +1099,7 @@ namespace RedSkullShoot
 				Font = new Font("Microsoft Sans Serif", 9f),
 				Margin = new Padding(0, 0, 20, 0)
 			};
-			CheckBox chkSniperScope = new CheckBox
+			chkSniperScope = new CheckBox
 			{
 				Text = "สไนเปอร์",
 				AutoSize = true,
@@ -1016,14 +1107,66 @@ namespace RedSkullShoot
 				Font = new Font("Microsoft Sans Serif", 9f),
 				Margin = new Padding(0, 0, 20, 0)
 			};
-			CheckBox chkManualMode = new CheckBox
+			chkManualMode = new CheckBox
 			{
-				Text = "ตั้งค่า ดีเลย์ กำหนดเอง",
+				Text = "กำหนดเอง",
 				AutoSize = true,
 				ForeColor = Color.White,
 				Font = new Font("Microsoft Sans Serif", 9f),
 				Margin = new Padding(0)
 			};
+			btnAutoShootToggle = new Button
+			{
+				Text = chkAutoShoot.Text,
+				Size = new Size(90, 32),
+				FlatStyle = FlatStyle.Flat,
+				ForeColor = Color.White,
+				BackColor = shootingButtonDefault,
+				Margin = new Padding(0, 0, 4, 0),
+				Cursor = Cursors.Hand
+			};
+			btnAutoShootToggle.FlatAppearance.BorderSize = 0;
+			btnAutoShootToggle.FlatAppearance.MouseOverBackColor = shootingButtonActive;
+			btnAutoShootToggle.FlatAppearance.MouseDownBackColor = shootingButtonActive;
+			btnShotgunToggle = new Button
+			{
+				Text = chkSniperNoScope.Text,
+				Size = new Size(80, 32),
+				FlatStyle = FlatStyle.Flat,
+				ForeColor = Color.White,
+				BackColor = shootingButtonDefault,
+				Margin = new Padding(0, 0, 4, 0),
+				Cursor = Cursors.Hand
+			};
+			btnShotgunToggle.FlatAppearance.BorderSize = 0;
+			btnShotgunToggle.FlatAppearance.MouseOverBackColor = shootingButtonActive;
+			btnShotgunToggle.FlatAppearance.MouseDownBackColor = shootingButtonActive;
+			btnSniperScopeToggle = new Button
+			{
+				Text = chkSniperScope.Text,
+				Size = new Size(80, 32),
+				FlatStyle = FlatStyle.Flat,
+				ForeColor = Color.White,
+				BackColor = shootingButtonDefault,
+				Margin = new Padding(0, 0, 4, 0),
+				Cursor = Cursors.Hand
+			};
+			btnSniperScopeToggle.FlatAppearance.BorderSize = 0;
+			btnSniperScopeToggle.FlatAppearance.MouseOverBackColor = shootingButtonActive;
+			btnSniperScopeToggle.FlatAppearance.MouseDownBackColor = shootingButtonActive;
+			btnManualModeToggle = new Button
+			{
+				Text = chkManualMode.Text,
+				Size = new Size(110, 32),
+				FlatStyle = FlatStyle.Flat,
+				ForeColor = Color.White,
+				BackColor = shootingButtonDefault,
+				Margin = new Padding(0),
+				Cursor = Cursors.Hand
+			};
+			btnManualModeToggle.FlatAppearance.BorderSize = 0;
+			btnManualModeToggle.FlatAppearance.MouseOverBackColor = shootingButtonActive;
+			btnManualModeToggle.FlatAppearance.MouseDownBackColor = shootingButtonActive;
 			FlowLayoutPanel shootingModeLayout = new FlowLayoutPanel
 			{
 				FlowDirection = FlowDirection.LeftToRight,
@@ -1033,11 +1176,47 @@ namespace RedSkullShoot
 				Margin = new Padding(0),
 				Padding = new Padding(0)
 			};
-			shootingModeLayout.Controls.Add(chkAutoShoot);
-			shootingModeLayout.Controls.Add(chkSniperNoScope);
-			shootingModeLayout.Controls.Add(chkSniperScope);
-			shootingModeLayout.Controls.Add(chkManualMode);
+			shootingModeLayout.Controls.Add(btnAutoShootToggle);
+			shootingModeLayout.Controls.Add(btnShotgunToggle);
+			shootingModeLayout.Controls.Add(btnSniperScopeToggle);
+			shootingModeLayout.Controls.Add(btnManualModeToggle);
 			shootingModeLayout.PerformLayout();
+			btnAutoShootToggle.Click += delegate (object s, EventArgs e)
+			{
+				if (!btnAutoShootToggle.Enabled)
+				{
+					return;
+				}
+				chkAutoShoot.Checked = !chkAutoShoot.Checked;
+				updateModeButtonStates();
+			};
+			btnShotgunToggle.Click += delegate (object s, EventArgs e)
+			{
+				if (!btnShotgunToggle.Enabled)
+				{
+					return;
+				}
+				chkSniperNoScope.Checked = !chkSniperNoScope.Checked;
+				updateModeButtonStates();
+			};
+			btnSniperScopeToggle.Click += delegate (object s, EventArgs e)
+			{
+				if (!btnSniperScopeToggle.Enabled)
+				{
+					return;
+				}
+				chkSniperScope.Checked = !chkSniperScope.Checked;
+				updateModeButtonStates();
+			};
+			btnManualModeToggle.Click += delegate (object s, EventArgs e)
+			{
+				if (!btnManualModeToggle.Enabled)
+				{
+					return;
+				}
+				chkManualMode.Checked = !chkManualMode.Checked;
+				updateModeButtonStates();
+			};
 			Size shootingSize = shootingModeLayout.PreferredSize;
 			int settingsLeft = Math.Max(centerX - 150, 20);
 			int inputRowHeight = 26;
@@ -1054,43 +1233,104 @@ namespace RedSkullShoot
 				Location = new Point(settingsLeft, currentY)
 			};
 			//currentY += inputRowHeight;
-			currentY -= 70;
-			CheckBox chkUseMouse = new CheckBox
+			currentY -= 40;
+			int deviceToggleTop = currentY;
+			int deviceToggleSpacing = 30;
+			chkUseMouse = new CheckBox
 			{
 				Text = "ใช้เมาส์",
 				AutoSize = true,
 				Checked = Program.useMouse,
-				Enabled = !Program.autoMode,
+				Enabled = (!Program.autoMode && Program.toggleMode),
 				ForeColor = Color.White,
 				Font = new Font("Microsoft Sans Serif", 9f),
-				Location = new Point(settingsLeft, currentY)
+				Location = new Point(settingsLeft, currentY),
+				Visible = false
 			};
+			btnUseMouseToggle = new Button
+			{
+				Text = chkUseMouse.Text,
+				Size = new Size(140, 32),
+				FlatStyle = FlatStyle.Flat,
+				ForeColor = Color.White,
+				BackColor = shootingButtonDefault,
+				Location = new Point(settingsLeft, currentY),
+				Cursor = Cursors.Hand
+			};
+			btnUseMouseToggle.FlatAppearance.BorderSize = 0;
+			btnUseMouseToggle.FlatAppearance.MouseOverBackColor = shootingButtonActive;
+			btnUseMouseToggle.FlatAppearance.MouseDownBackColor = shootingButtonActive;
 			ComboBox cmbMouseButton = new ComboBox
 			{
-				Location = new Point(valueLeft, currentY + 2),
-				Size = new Size(180, 20),
+				Location = new Point(settingsLeft, btnUseMouseToggle.Bottom + 4),
+				Size = new Size(btnUseMouseToggle.Width, 24),
 				DropDownStyle = ComboBoxStyle.DropDownList,
-				Enabled = (Program.useMouse && !Program.autoMode)
+				Enabled = (Program.useMouse && Program.toggleMode && !Program.autoMode)
 			};
-			currentY += inputRowHeight;
-			CheckBox chkUseKeyboard = new CheckBox
+			int keyboardLeft = settingsLeft + btnUseMouseToggle.Width + 30;
+			chkUseKeyboard = new CheckBox
 			{
 				Text = "ใช้คีย์บอร์ด",
 				AutoSize = true,
 				Checked = Program.useKeyboard,
-				Enabled = !Program.autoMode,
+				Enabled = (!Program.autoMode && Program.toggleMode),
 				ForeColor = Color.White,
 				Font = new Font("Microsoft Sans Serif", 9f),
-				Location = new Point(settingsLeft, currentY)
+				Location = new Point(keyboardLeft, currentY),
+				Visible = false
 			};
+			btnUseKeyboardToggle = new Button
+			{
+				Text = chkUseKeyboard.Text,
+				Size = new Size(140, 32),
+				FlatStyle = FlatStyle.Flat,
+				ForeColor = Color.White,
+				BackColor = shootingButtonDefault,
+				Location = new Point(keyboardLeft, currentY),
+				Cursor = Cursors.Hand
+			};
+			btnUseKeyboardToggle.FlatAppearance.BorderSize = 0;
+			btnUseKeyboardToggle.FlatAppearance.MouseOverBackColor = shootingButtonActive;
+			btnUseKeyboardToggle.FlatAppearance.MouseDownBackColor = shootingButtonActive;
 			ComboBox cmbKey = new ComboBox
 			{
-				Location = new Point(valueLeft, currentY + 2),
-				Size = new Size(180, 20),
+				Location = new Point(keyboardLeft, btnUseKeyboardToggle.Bottom + 4),
+				Size = new Size(btnUseKeyboardToggle.Width, 24),
 				DropDownStyle = ComboBoxStyle.DropDownList,
-				Enabled = (Program.useKeyboard && !Program.autoMode)
+				Enabled = (Program.useKeyboard && Program.toggleMode && !Program.autoMode)
 			};
-			currentY += inputRowHeight;
+			Action positionDeviceControls = delegate
+			{
+				int panelWidth = mainPanel.ClientSize.Width;
+				int centerX2 = panelWidth / 2;
+				int totalWidth = btnUseMouseToggle.Width + deviceToggleSpacing + btnUseKeyboardToggle.Width;
+				int deviceLeft = Math.Max(centerX2 - totalWidth / 2, 20);
+				btnUseMouseToggle.Location = new Point(deviceLeft, deviceToggleTop);
+				cmbMouseButton.Location = new Point(btnUseMouseToggle.Left, btnUseMouseToggle.Bottom + 4);
+				int keyboardLeftInner = deviceLeft + btnUseMouseToggle.Width + deviceToggleSpacing;
+				btnUseKeyboardToggle.Location = new Point(keyboardLeftInner, deviceToggleTop);
+				cmbKey.Location = new Point(btnUseKeyboardToggle.Left, btnUseKeyboardToggle.Bottom + 4);
+			};
+			positionDeviceControls();
+			currentY = Math.Max(cmbMouseButton.Bottom, cmbKey.Bottom) - 35;
+			btnUseMouseToggle.Click += delegate (object s, EventArgs e)
+			{
+				if (!btnUseMouseToggle.Enabled)
+				{
+					return;
+				}
+				chkUseMouse.Checked = !chkUseMouse.Checked;
+				updateModeButtonStates();
+			};
+			btnUseKeyboardToggle.Click += delegate (object s, EventArgs e)
+			{
+				if (!btnUseKeyboardToggle.Enabled)
+				{
+					return;
+				}
+				chkUseKeyboard.Checked = !chkUseKeyboard.Checked;
+				updateModeButtonStates();
+			};
 			Label lblFov = new Label
 			{
 				Text = "ขนาด FOV:",
@@ -1133,7 +1373,7 @@ namespace RedSkullShoot
 			// ----- แล้วค่อยวางปุ่ม แก้ไขลำดับการทำงาน -----
 			Button btnEditActions = new Button
 			{
-				Text = "แก้ไข ดีเลย์ การทำงาน",
+				Text = "แก้ไข ดีเลย์",
 				Width = mainPanel.ClientSize.Width - 40, // เว้นขอบด้านซ้าย/ขวา
 				Height = 40,
 				BackColor = Color.FromArgb(45, 45, 65),
@@ -1166,8 +1406,10 @@ namespace RedSkullShoot
 				shootingSize = shootingModeLayout.PreferredSize;
 				int shootingLeft = Math.Max(centerX2 - shootingSize.Width / 2, 20);
 				shootingModeLayout.Location = new Point(shootingLeft, shootingTop);
+				positionDeviceControls();
 			};
 			centerModeControls();
+			updateModeButtonStates();
 			Label lblColorSettings = new Label
 			{
 				Text = "การตั้งค่าสี:",
@@ -1298,6 +1540,7 @@ namespace RedSkullShoot
 				finally
 				{
 					Program.isUpdatingCheckboxes = false;
+					updateModeButtonStates();
 				}
 			};
 			chkSniperNoScope.CheckedChanged += delegate (object s, EventArgs e)
@@ -1351,6 +1594,7 @@ namespace RedSkullShoot
 				finally
 				{
 					Program.isUpdatingCheckboxes = false;
+					updateModeButtonStates();
 				}
 			};
 			chkSniperScope.CheckedChanged += delegate (object s, EventArgs e)
@@ -1410,6 +1654,7 @@ namespace RedSkullShoot
 				finally
 				{
 					Program.isUpdatingCheckboxes = false;
+					updateModeButtonStates();
 				}
 			};
 			chkManualMode.CheckedChanged += delegate (object s, EventArgs e)
@@ -1436,6 +1681,7 @@ namespace RedSkullShoot
 				finally
 				{
 					Program.isUpdatingCheckboxes = false;
+					updateModeButtonStates();
 				}
 			};
 			btnEditActions.Enabled = chkManualMode.Checked;
@@ -1732,34 +1978,35 @@ namespace RedSkullShoot
 			{
 				bool isAutoMode = chkAutoMode.Checked;
 				chkHoldToActivate.Enabled = !isAutoMode;
-				chkUseMouse.Enabled = !isAutoMode;
-				chkUseKeyboard.Enabled = !isAutoMode;
+				chkUseMouse.Enabled = (!isAutoMode && chkToggleMode.Checked);
+				chkUseKeyboard.Enabled = (!isAutoMode && chkToggleMode.Checked);
 				//lblMouseButton.Enabled = (chkUseMouse.Checked && !isAutoMode);
-				cmbMouseButton.Enabled = (chkUseMouse.Checked && !isAutoMode);
+				cmbMouseButton.Enabled = (chkUseMouse.Checked && !isAutoMode && chkToggleMode.Checked);
 				//lblKey.Enabled = (chkUseKeyboard.Checked && !isAutoMode);
-				cmbKey.Enabled = (chkUseKeyboard.Checked && !isAutoMode);
+				cmbKey.Enabled = (chkUseKeyboard.Checked && !isAutoMode && chkToggleMode.Checked);
 				if (isAutoMode)
 				{
 					chkHoldToActivate.Checked = false;
 				}
+				updateModeButtonStates();
 			};
 			chkUseMouse.CheckedChanged += delegate (object s, EventArgs e)
 			{
-				//lblMouseButton.Enabled = (chkUseMouse.Checked && !chkAutoMode.Checked);
-				cmbMouseButton.Enabled = (chkUseMouse.Checked && !chkAutoMode.Checked);
+				cmbMouseButton.Enabled = (chkUseMouse.Checked && !chkAutoMode.Checked && chkToggleMode.Checked);
 				if (chkUseMouse.Checked)
 				{
 					chkUseKeyboard.Checked = false;
 				}
+				updateModeButtonStates();
 			};
 			chkUseKeyboard.CheckedChanged += delegate (object s, EventArgs e)
 			{
-				//lblKey.Enabled = (chkUseKeyboard.Checked && !chkAutoMode.Checked);
-				cmbKey.Enabled = (chkUseKeyboard.Checked && !chkAutoMode.Checked);
+				cmbKey.Enabled = (chkUseKeyboard.Checked && !chkAutoMode.Checked && chkToggleMode.Checked);
 				if (chkUseKeyboard.Checked)
 				{
 					chkUseMouse.Checked = false;
 				}
+				updateModeButtonStates();
 			};
 			btnEditActions.Click += delegate (object s, EventArgs e)
 			{
@@ -1775,10 +2022,17 @@ namespace RedSkullShoot
 					chkHoldToActivate.Enabled = false;
 					chkUseMouse.Enabled = true;
 					chkUseKeyboard.Enabled = true;
+					updateModeButtonStates();
 					return;
 				}
 				chkAutoMode.Enabled = true;
 				chkHoldToActivate.Enabled = !chkAutoMode.Checked;
+				chkUseMouse.Checked = false;
+				chkUseKeyboard.Checked = false;
+				chkUseMouse.Enabled = false;
+				chkUseKeyboard.Enabled = false;
+				updateModeButtonStates();
+				updateModeButtonStates();
 			};
 			chkAutoMode.CheckedChanged += delegate (object s, EventArgs e)
 			{
@@ -1788,6 +2042,7 @@ namespace RedSkullShoot
 					chkToggleMode.Checked = false;
 				}
 				chkToggleMode.Enabled = !isAutoMode;
+				updateModeButtonStates();
 			};
 			chkHoldToActivate.CheckedChanged += delegate (object s, EventArgs e)
 			{
@@ -1802,9 +2057,9 @@ namespace RedSkullShoot
 				cmbResolution,
 				activationModeLayout,
 				//chkHoldToActivate,
-				chkUseMouse,
+				btnUseMouseToggle,
 				cmbMouseButton,
-				chkUseKeyboard,
+				btnUseKeyboardToggle,
 				cmbKey,
 				//lblFov,
 				//numFov,
