@@ -372,7 +372,7 @@ namespace RedSkullShoot
 
 			Program.mainForm = new Form
 			{
-				Text = "กระโหลกแดง \uD83D\uDC80 (Red Skull)    Version 1.01",
+				Text = "กระโหลกแดง \uD83D\uDC80 (Red Skull)",
 				Size = new Size(550, 470),
 				StartPosition = FormStartPosition.CenterScreen,
 				FormBorderStyle = FormBorderStyle.FixedDialog,
@@ -1740,53 +1740,14 @@ namespace RedSkullShoot
 			{
 				sniperZoomLayout.Size = Size.Empty;
 			}
+			chkSniperZoom.Checked = Program.sniperZoomEnabled;
 			cmbSniperZoomButton.SelectedIndex = (Program.sniperZoomButton == MouseButtons.XButton2) ? 1 : 0;
 			if (cmbSniperZoomButton.SelectedIndex < 0)
 			{
 				cmbSniperZoomButton.SelectedIndex = 0;
 			}
-			bool isUpdatingSniperZoom = true;
-			chkSniperZoom.Checked = Program.sniperZoomEnabled;
-			isUpdatingSniperZoom = false;
 			cmbSniperZoomButton.Enabled = chkSniperZoom.Checked;
-			Func<bool> isSniperZoomContextActive = () =>
-			{
-				if (!chkToggleMode.Checked)
-				{
-					return false;
-				}
-				if (!(chkUseMouse.Checked || chkUseKeyboard.Checked))
-				{
-					return false;
-				}
-				if (chkSniperScope.Checked)
-				{
-					return true;
-				}
-				bool manualOnly = chkManualMode.Checked && !chkAutoShoot.Checked && !chkSniperNoScope.Checked && !chkSniperScope.Checked;
-				return manualOnly && string.Equals(Program.currentShootingMode, "SniperScope", StringComparison.OrdinalIgnoreCase);
-			};
-			Func<bool> looksLikeSniperScopeSequence = () =>
-			{
-				if (Program.actionSequence == null || Program.actionSequence.Count < 5)
-				{
-					return false;
-				}
-				if (Program.actionSequence.Count == 5)
-				{
-					ActionItem a0 = Program.actionSequence[0];
-					ActionItem a1 = Program.actionSequence[1];
-					ActionItem a2 = Program.actionSequence[2];
-					ActionItem a3 = Program.actionSequence[3];
-					ActionItem a4 = Program.actionSequence[4];
-					return a0.Type == ActionItem.ActionType.MouseClick && string.Equals(a0.Value, "Right", StringComparison.OrdinalIgnoreCase) &&
-						a1.Type == ActionItem.ActionType.MouseClick && string.Equals(a1.Value, "Left", StringComparison.OrdinalIgnoreCase) &&
-						a2.Type == ActionItem.ActionType.KeyPress && string.Equals(a2.Value, "3", StringComparison.OrdinalIgnoreCase) &&
-						a3.Type == ActionItem.ActionType.KeyPress && string.Equals(a3.Value, "1", StringComparison.OrdinalIgnoreCase) &&
-						a4.Type == ActionItem.ActionType.Delay;
-				}
-				return false;
-			};
+			bool isUpdatingSniperZoom = false;
 			Action refreshDynamicLayouts = null;
 			Action updateSniperZoomSection = null;
 			updateSniperZoomSection = delegate
@@ -1796,17 +1757,13 @@ namespace RedSkullShoot
 					return;
 				}
 				isUpdatingSniperZoom = true;
-				bool contextActive = isSniperZoomContextActive();
-				bool manualSniperSequence = (!contextActive && looksLikeSniperScopeSequence());
-				bool shouldShowLayout = contextActive || manualSniperSequence;
-				if (!shouldShowLayout && chkSniperZoom.Checked)
+				bool canShow = chkToggleMode.Checked && chkSniperScope.Checked;
+				if (!chkUseMouse.Checked && !chkUseKeyboard.Checked)
 				{
-					chkSniperZoom.Checked = false;
+					canShow = false;
 				}
-				bool effectiveEnabled = (chkSniperZoom.Checked && shouldShowLayout);
-				Program.sniperZoomEnabled = effectiveEnabled;
-				sniperZoomLayout.Visible = shouldShowLayout;
-				if (shouldShowLayout)
+				sniperZoomLayout.Visible = canShow;
+				if (canShow)
 				{
 					sniperZoomLayout.PerformLayout();
 					sniperZoomLayout.Size = sniperZoomLayout.PreferredSize;
@@ -1814,8 +1771,13 @@ namespace RedSkullShoot
 				else
 				{
 					sniperZoomLayout.Size = Size.Empty;
+					if (chkSniperZoom.Checked)
+					{
+						chkSniperZoom.Checked = false;
+					}
 				}
-				cmbSniperZoomButton.Enabled = effectiveEnabled;
+				cmbSniperZoomButton.Enabled = (chkSniperZoom.Checked && canShow);
+				Program.sniperZoomEnabled = (chkSniperZoom.Checked && canShow);
 				if (refreshDynamicLayouts != null)
 				{
 					refreshDynamicLayouts();
@@ -1833,7 +1795,13 @@ namespace RedSkullShoot
 				{
 					cmbSniperZoomButton.SelectedIndex = 0;
 				}
-				updateSniperZoomSection();
+				Program.sniperZoomEnabled = (chkSniperZoom.Checked && sniperZoomLayout.Visible);
+				cmbSniperZoomButton.Enabled = Program.sniperZoomEnabled;
+				if (refreshDynamicLayouts != null)
+				{
+					refreshDynamicLayouts();
+				}
+				updateModeButtonStates();
 			};
 			cmbSniperZoomButton.SelectedIndexChanged += delegate
 			{
@@ -2409,43 +2377,41 @@ int activationTop = activationModeLayout.Location.Y;
 			}
 			numFov.Value = Math.Max(numFov.Minimum, Math.Min(Program.customRegion.Width, numFov.Maximum));
 			numScreenHeight.Value = Math.Max(numScreenHeight.Minimum, Math.Min(Program.customRegion.Height, numScreenHeight.Maximum));
-			bool matchedPresetMode = false;
-			Program.isUpdatingCheckboxes = true;
-			try
+			if (Program.actionSequence != null && Program.actionSequence.Count > 0)
 			{
-				chkAutoShoot.Checked = false;
-				chkSniperNoScope.Checked = false;
-				chkSniperScope.Checked = false;
-				chkManualMode.Checked = false;
-				if (Program.actionSequence != null && Program.actionSequence.Count > 0)
+				if (Program.actionSequence.Count == 1 && Program.actionSequence[0].Type == ActionItem.ActionType.MouseClick && Program.actionSequence[0].Value == "Left")
 				{
-					if (Program.actionSequence.Count == 1 && Program.actionSequence[0].Type == ActionItem.ActionType.MouseClick && Program.actionSequence[0].Value == "Left")
-					{
-						chkAutoShoot.Checked = true;
-						matchedPresetMode = true;
-					}
-					else if (Program.actionSequence.Count == 4 && Program.actionSequence[0].Type == ActionItem.ActionType.MouseClick && Program.actionSequence[0].Value == "Left" && Program.actionSequence[1].Type == ActionItem.ActionType.KeyPress && Program.actionSequence[1].Value == "3" && Program.actionSequence[2].Type == ActionItem.ActionType.KeyPress && Program.actionSequence[2].Value == "1" && Program.actionSequence[3].Type == ActionItem.ActionType.Delay)
-					{
-						chkSniperNoScope.Checked = true;
-						matchedPresetMode = true;
-					}
-					else if (Program.actionSequence.Count == 5 && Program.actionSequence[0].Type == ActionItem.ActionType.MouseClick && Program.actionSequence[0].Value == "Right" && Program.actionSequence[1].Type == ActionItem.ActionType.MouseClick && Program.actionSequence[1].Value == "Left" && Program.actionSequence[2].Type == ActionItem.ActionType.KeyPress && Program.actionSequence[2].Value == "3" && Program.actionSequence[3].Type == ActionItem.ActionType.KeyPress && Program.actionSequence[3].Value == "1" && Program.actionSequence[4].Type == ActionItem.ActionType.Delay)
-					{
-						chkSniperScope.Checked = true;
-						matchedPresetMode = true;
-					}
+					chkAutoShoot.Checked = true;
 				}
-				if (!matchedPresetMode)
+				else if (Program.actionSequence.Count == 4 && Program.actionSequence[0].Type == ActionItem.ActionType.MouseClick && Program.actionSequence[0].Value == "Left" && Program.actionSequence[1].Type == ActionItem.ActionType.KeyPress && Program.actionSequence[1].Value == "3" && Program.actionSequence[2].Type == ActionItem.ActionType.KeyPress && Program.actionSequence[2].Value == "1" && Program.actionSequence[3].Type == ActionItem.ActionType.Delay)
+				{
+					chkSniperNoScope.Checked = true;
+				}
+				else if (Program.actionSequence.Count == 5 && Program.actionSequence[0].Type == ActionItem.ActionType.MouseClick && Program.actionSequence[0].Value == "Right" && Program.actionSequence[1].Type == ActionItem.ActionType.MouseClick && Program.actionSequence[1].Value == "Left" && Program.actionSequence[2].Type == ActionItem.ActionType.KeyPress && Program.actionSequence[2].Value == "3" && Program.actionSequence[3].Type == ActionItem.ActionType.KeyPress && Program.actionSequence[3].Value == "1" && Program.actionSequence[4].Type == ActionItem.ActionType.Delay)
+				{
+					chkSniperScope.Checked = true;
+				}
+				else
 				{
 					chkManualMode.Checked = true;
 				}
 			}
-			finally
+			else
 			{
-				Program.isUpdatingCheckboxes = false;
+				chkManualMode.Checked = true;
 			}
-			updateModeButtonStates();
-			updateSniperZoomSection();
+			if (!chkAutoShoot.Checked && !chkSniperNoScope.Checked && !chkSniperScope.Checked && !chkManualMode.Checked)
+			{
+				chkManualMode.Checked = true;
+			}
+			else
+			{
+				chkManualMode.Checked = true;
+			}
+			if (!chkAutoShoot.Checked && !chkSniperNoScope.Checked && !chkSniperScope.Checked && !chkManualMode.Checked)
+			{
+				chkManualMode.Checked = true;
+			}
 			EventHandler resolutionChangedHandler = null;
 			resolutionChangedHandler = delegate (object s, EventArgs e)
 			{
@@ -2618,7 +2584,7 @@ int activationTop = activationModeLayout.Location.Y;
 				Program.redThreshold = (int)numRedThreshold.Value;
 				Program.greenThreshold = (int)numGreenThreshold.Value;
 				Program.blueThreshold = (int)numBlueThreshold.Value;
-				Program.sniperZoomEnabled = chkSniperZoom.Checked;
+				Program.sniperZoomEnabled = (chkSniperZoom.Checked && sniperZoomLayout.Visible);
 				Program.sniperZoomButton = (cmbSniperZoomButton.SelectedIndex == 1) ? MouseButtons.XButton2 : MouseButtons.XButton1;
 				if (!chkAutoShoot.Checked && !chkSniperNoScope.Checked && !chkSniperScope.Checked && !chkManualMode.Checked)
 				{

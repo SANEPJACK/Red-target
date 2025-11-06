@@ -53,6 +53,16 @@ namespace RedSkullShoot
 		// Token: 0x17000011 RID: 17
 		// (get) Token: 0x06000021 RID: 33 RVA: 0x0000292B File Offset: 0x00000B2B
 		// (set) Token: 0x06000022 RID: 34 RVA: 0x00002933 File Offset: 0x00000B33
+		public bool SniperZoomEnabled { get; set; }
+
+		// Token: 0x17000012 RID: 18
+		// (get) Token: 0x06000023 RID: 35 RVA: 0x0000293C File Offset: 0x00000B3C
+		// (set) Token: 0x06000024 RID: 36 RVA: 0x00002944 File Offset: 0x00000B44
+		public MouseButtons SniperZoomButton { get; set; } = MouseButtons.XButton1;
+
+		// Token: 0x17000011 RID: 17
+		// (get) Token: 0x06000021 RID: 33 RVA: 0x0000292B File Offset: 0x00000B2B
+		// (set) Token: 0x06000022 RID: 34 RVA: 0x00002933 File Offset: 0x00000B33
 		[XmlIgnore]
 		public bool UseMouse { get; set; }
 
