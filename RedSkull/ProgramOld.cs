@@ -1909,46 +1909,41 @@ namespace RedSkullShoot
 			}
 			numFov.Value = Math.Max(numFov.Minimum, Math.Min(Program.customRegion.Width, numFov.Maximum));
 			numScreenHeight.Value = Math.Max(numScreenHeight.Minimum, Math.Min(Program.customRegion.Height, numScreenHeight.Maximum));
-			Program.isUpdatingCheckboxes = true;
-			try
+			if (Program.actionSequence != null && Program.actionSequence.Count > 0)
 			{
-				chkAutoShoot.Checked = false;
-				chkSniperNoScope.Checked = false;
-				chkSniperScope.Checked = false;
-				chkManualMode.Checked = false;
-				if (Program.actionSequence != null && Program.actionSequence.Count > 0)
+				if (Program.actionSequence.Count == 1 && Program.actionSequence[0].Type == ActionItem.ActionType.MouseClick && Program.actionSequence[0].Value == "Left")
 				{
-					if (Program.actionSequence.Count == 1 && Program.actionSequence[0].Type == ActionItem.ActionType.MouseClick && Program.actionSequence[0].Value == "Left")
-					{
-						chkAutoShoot.Checked = true;
-					}
-					else if (Program.actionSequence.Count == 4 && Program.actionSequence[0].Type == ActionItem.ActionType.MouseClick && Program.actionSequence[0].Value == "Left" && Program.actionSequence[1].Type == ActionItem.ActionType.KeyPress && Program.actionSequence[1].Value == "3" && Program.actionSequence[2].Type == ActionItem.ActionType.KeyPress && Program.actionSequence[2].Value == "1" && Program.actionSequence[3].Type == ActionItem.ActionType.Delay)
-					{
-						chkSniperNoScope.Checked = true;
-					}
-					else if (Program.actionSequence.Count == 5 && Program.actionSequence[0].Type == ActionItem.ActionType.MouseClick && Program.actionSequence[0].Value == "Right" && Program.actionSequence[1].Type == ActionItem.ActionType.MouseClick && Program.actionSequence[1].Value == "Left" && Program.actionSequence[2].Type == ActionItem.ActionType.KeyPress && Program.actionSequence[2].Value == "3" && Program.actionSequence[3].Type == ActionItem.ActionType.KeyPress && Program.actionSequence[3].Value == "1" && Program.actionSequence[4].Type == ActionItem.ActionType.Delay)
-					{
-						chkSniperScope.Checked = true;
-					}
-					else
-					{
-						chkManualMode.Checked = true;
-					}
+					chkAutoShoot.Checked = true;
+				}
+				else if (Program.actionSequence.Count == 4 && Program.actionSequence[0].Type == ActionItem.ActionType.MouseClick && Program.actionSequence[0].Value == "Left" && Program.actionSequence[1].Type == ActionItem.ActionType.KeyPress && Program.actionSequence[1].Value == "3" && Program.actionSequence[2].Type == ActionItem.ActionType.KeyPress && Program.actionSequence[2].Value == "1" && Program.actionSequence[3].Type == ActionItem.ActionType.Delay)
+				{
+					chkSniperNoScope.Checked = true;
+				}
+				else if (Program.actionSequence.Count == 5 && Program.actionSequence[0].Type == ActionItem.ActionType.MouseClick && Program.actionSequence[0].Value == "Right" && Program.actionSequence[1].Type == ActionItem.ActionType.MouseClick && Program.actionSequence[1].Value == "Left" && Program.actionSequence[2].Type == ActionItem.ActionType.KeyPress && Program.actionSequence[2].Value == "3" && Program.actionSequence[3].Type == ActionItem.ActionType.KeyPress && Program.actionSequence[3].Value == "1" && Program.actionSequence[4].Type == ActionItem.ActionType.Delay)
+				{
+					chkSniperScope.Checked = true;
 				}
 				else
 				{
 					chkManualMode.Checked = true;
 				}
-				if (!chkAutoShoot.Checked && !chkSniperNoScope.Checked && !chkSniperScope.Checked && !chkManualMode.Checked)
-				{
-					chkManualMode.Checked = true;
-				}
 			}
-			finally
+			else
 			{
-				Program.isUpdatingCheckboxes = false;
+				chkManualMode.Checked = true;
 			}
-			updateModeButtonStates();
+			if (!chkAutoShoot.Checked && !chkSniperNoScope.Checked && !chkSniperScope.Checked && !chkManualMode.Checked)
+			{
+				chkManualMode.Checked = true;
+			}
+			else
+			{
+				chkManualMode.Checked = true;
+			}
+			if (!chkAutoShoot.Checked && !chkSniperNoScope.Checked && !chkSniperScope.Checked && !chkManualMode.Checked)
+			{
+				chkManualMode.Checked = true;
+			}
 			EventHandler resolutionChangedHandler = null;
 			resolutionChangedHandler = delegate (object s, EventArgs e)
 			{
@@ -3740,12 +3735,7 @@ namespace RedSkullShoot
 			{
 				if (screenshot != null && Program.DetectRedPixelBgr(screenshot))
 				{
-					IEnumerable<ActionItem> actionsToRun = Program.actionSequence;
-					if (Program.IsShotgunOverrideActive())
-					{
-						actionsToRun = Program.shotgunOverrideSequence;
-					}
-					foreach (ActionItem action in actionsToRun)
+					foreach (ActionItem action in Program.actionSequence)
 					{
 						switch (action.Type)
 						{
@@ -4290,23 +4280,6 @@ namespace RedSkullShoot
 			}
 		}
 
-		private static bool IsShotgunOverrideActive()
-		{
-			if (!string.Equals(Program.currentShootingMode, "SniperScope", StringComparison.OrdinalIgnoreCase))
-			{
-				return false;
-			}
-			if (((int)Program.GetAsyncKeyState(4) & 32768) != 0)
-			{
-				return true;
-			}
-			if (((int)Program.GetAsyncKeyState(6) & 32768) != 0)
-			{
-				return true;
-			}
-			return false;
-		}
-
 		// Token: 0x06000063 RID: 99 RVA: 0x00008A78 File Offset: 0x00006C78
 		private static void cmbType_SelectedIndexChanged(object sender, EventArgs e)
 		{
@@ -4417,34 +4390,6 @@ namespace RedSkullShoot
 
 		// Token: 0x04000027 RID: 39
 		private static List<ActionItem> actionSequence = new List<ActionItem>();
-
-		private static readonly List<ActionItem> shotgunOverrideSequence = new List<ActionItem>
-		{
-			new ActionItem
-			{
-				Type = ActionItem.ActionType.MouseClick,
-				Value = "Left",
-				DelayMs = 10
-			},
-			new ActionItem
-			{
-				Type = ActionItem.ActionType.KeyPress,
-				Value = "3",
-				DelayMs = 0
-			},
-			new ActionItem
-			{
-				Type = ActionItem.ActionType.KeyPress,
-				Value = "1",
-				DelayMs = 0
-			},
-			new ActionItem
-			{
-				Type = ActionItem.ActionType.Delay,
-				Value = "Wait",
-				DelayMs = 550
-			}
-		};
 
 		// Token: 0x04000028 RID: 40
 		private static string currentShootingMode = "Manual";
