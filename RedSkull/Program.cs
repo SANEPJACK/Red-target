@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -81,6 +82,21 @@ namespace RedSkullShoot
 			Application.Run(Program.mainForm);
 		}
 
+		private static async Task<string[]> FetchAllowedUuidsAsync()
+		{
+			using (var client = new HttpClient())
+			{
+				var csv = await client.GetStringAsync(AllowedUuidUrl).ConfigureAwait(false);
+				return csv
+					.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+					.Select(line => line.Trim())
+					.Where(line => !string.IsNullOrWhiteSpace(line))
+					.Select(line => line.EndsWith("ModeHC", StringComparison.OrdinalIgnoreCase) ? line : line + "ModeHC")
+					.ToArray();
+			}
+		}
+
+
 		private static async void Checkuuid()
 		{
 			if (Program.lblCountdown != null && Program.mainForm != null && !Program.mainForm.IsDisposed)
@@ -93,13 +109,27 @@ namespace RedSkullShoot
 					return;
 				}
 
-				// รายการ UUID ที่อนุญาต
-				string[] allowedUUIDs = new string[]
+				// โหลดรายการ UUID ที่อนุญาตจาก Google Sheet
+				string[] allowedUUIDs = null;
+				try
 				{
-				"s37616BCC-29F2-11B2-A85C-EB15EAAF6326ModeHC", // DEV
-				"81006B9C-9588-0000-0000-000000000000ModeHC",  // JACK
-				"035E02D8-04D3-054B-6F06-7E0700080009ModeHC",  // P KE
-				};
+					allowedUUIDs = await Program.FetchAllowedUuidsAsync();
+				}
+				catch (Exception ex)
+				{
+					Debug.WriteLine("FetchAllowedUuidsAsync failed: " + ex.Message);
+				}
+
+				if (allowedUUIDs == null || allowedUUIDs.Length == 0)
+				{
+					Program.ShowFatalMessageAndExit(
+						"ไม่สามารถเชื่อมต่อไปยังเซิร์ฟเวอร์ยืนยันสิทธิ์ได้ในขณะนี้\nโปรแกรมจะปิดอัตโนมัติภายใน 3 วินาที",
+						"Connection Error",
+						MessageBoxIcon.Error,
+						null
+					);
+					return;
+				}
 
 				string current_uuid = AuthCheck.GetMachineUUID() + "ModeHC";
 				string current_uuid_plain = AuthCheck.GetMachineUUID();
@@ -108,7 +138,7 @@ namespace RedSkullShoot
 				{
 					DialogResult r = MessageBox.Show(
 						"เครื่องนี้ไม่ได้รับอนุญาตให้ใช้งาน\n\nรหัสสมาชิกของคุณคือ:\n\n" + current_uuid_plain +
-						"\n\n(กด OK เพื่อ Copy และติดต่อแอดมินผ่าน Discord)",
+						"\n\n(กด OK เพื่อ Copy รหัสสมาชิกของคุณ)",
 						"Access Denied",
 						MessageBoxButtons.OKCancel,
 						MessageBoxIcon.Error
@@ -117,9 +147,14 @@ namespace RedSkullShoot
 					Program.lblCountdown.Text = "สถานะโปรแกรม : ไม่ได้รับอนุญาต";
 					Program.lblCountdown.ForeColor = Color.OrangeRed;
 
-
+					if (r == DialogResult.OK)
+					{
+						Clipboard.SetText(current_uuid_plain);
+						MessageBox.Show("✅ คัดลอกเรียบร้อยแล้ว!\nโปรดติดต่อ Admin เพื่อปลดล็อค (ขณะนี้อยู่ในโหมดทดลอง)", "Copied", MessageBoxButtons.OK, MessageBoxIcon.Information);
+					}
 
 					Program.isTrialMode = true;
+					Program.trialExpirationHandled = false;
 					Program.trialStartTime = DateTime.Now;
 					Program.CheckTrialTime();
 					//Application.Exit();
@@ -128,6 +163,7 @@ namespace RedSkullShoot
 				else
 				{
 					Program.isTrialMode = false;
+					Program.trialExpirationHandled = false;
 					Program.lblCountdown.Text = "สถานะโปรแกรม : ได้รับอนุญาต";
 					Program.lblCountdown.ForeColor = Color.Green;
 					if (Program.lblCountdown1 != null)
@@ -158,25 +194,98 @@ namespace RedSkullShoot
 				Program.lblCountdown1.Text = string.Empty;
 				return;
 			}
-			const int trialDurationSeconds = 18; // 3 นาที = 180 วินาที
+			const int trialDurationSeconds = 20; // 3 นาที = 180 วินาที
 			TimeSpan used = DateTime.Now - Program.trialStartTime;
 			int elapsedSeconds = Math.Max(0, (int)used.TotalSeconds);
 			int remainingSeconds = Math.Max(0, trialDurationSeconds - elapsedSeconds);
 			Program.lblCountdown1.Text = $"🕒 ทดลองใช้ไปแล้ว: {elapsedSeconds} วินาที (เหลือ {remainingSeconds} วินาที)";
 			Program.lblCountdown1.ForeColor = (remainingSeconds <= 30) ? Color.OrangeRed : Color.MediumBlue;
-			if (elapsedSeconds < trialDurationSeconds)
+			if (elapsedSeconds < trialDurationSeconds || Program.trialExpirationHandled)
 			{
 				return;
 			}
-			Program.countdownTimer?.Stop();
-			MessageBox.Show(
-				"หมดอายุการทดลองใช้แล้ว\nโปรดติดต่อ Admin เพื่อปลดล็อค",
+			Program.trialExpirationHandled = true;
+			Program.ShowFatalMessageAndExit(
+				"หมดอายุการทดลองแล้ว\nโปรแกรมจะปิดอัตโนมัติภายใน 3 วินาที\nกด OK เพื่อเปิด Discord ติดต่อ Admin เพื่อปลดล็อค",
 				"Trial Expired",
-				MessageBoxButtons.OK,
-				MessageBoxIcon.Warning
+				MessageBoxIcon.Warning,
+				new Action(Program.OpenDiscordInvite)
 			);
-			Application.Exit();
-			Environment.Exit(0);
+		}
+
+
+		private static void ShowFatalMessageAndExit(string message, string caption, MessageBoxIcon icon, Action onOk)
+		{
+			Program.countdownTimer?.Stop();
+			CancellationTokenSource autoExitCts = new CancellationTokenSource();
+			Task.Run(async delegate
+			{
+				try
+				{
+					await Task.Delay(3000, autoExitCts.Token);
+				}
+				catch (TaskCanceledException)
+				{
+					return;
+				}
+				Program.ForceCloseApplication();
+			});
+			DialogResult dialogResult = MessageBox.Show(message, caption, MessageBoxButtons.OK, icon);
+			autoExitCts.Cancel();
+			if (dialogResult == DialogResult.OK && onOk != null)
+			{
+				try
+				{
+					onOk();
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show("❌ เปิดลิงก์ไม่สำเร็จ: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				}
+			}
+			Task.Run(async delegate
+			{
+				await Task.Delay(3000);
+				Program.ForceCloseApplication();
+			});
+		}
+
+
+		private static void ForceCloseApplication()
+		{
+			Action exitAction = delegate
+			{
+				try
+				{
+					Application.Exit();
+				}
+				catch
+				{
+				}
+				Environment.Exit(0);
+			};
+			if (Program.mainForm != null && !Program.mainForm.IsDisposed)
+			{
+				try
+				{
+					Program.mainForm.BeginInvoke(exitAction);
+					return;
+				}
+				catch
+				{
+				}
+			}
+			exitAction();
+		}
+
+
+		private static void OpenDiscordInvite()
+		{
+			System.Diagnostics.Process.Start(new ProcessStartInfo
+			{
+				FileName = "https://discord.gg/msHbnzpzTZ",
+				UseShellExecute = true
+			});
 		}
 
 
@@ -4536,6 +4645,8 @@ namespace RedSkullShoot
 		// Token: 0x0400002C RID: 44.1
 		private static bool isTrialMode;
 
+		private static bool trialExpirationHandled;
+
 		// Token: 0x0400002D RID: 45
 		private static int redThreshold = 200;
 
@@ -4883,6 +4994,8 @@ namespace RedSkullShoot
 
 		// Token: 0x040000A0 RID: 160
 		private static readonly string settingsFilePath = Path.Combine(Path.GetTempPath(), "Settings.xml");
+
+		private const string AllowedUuidUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQLGHuV2m_yguXsyM_HNOwW1NwJFi7i0iifJcMsX8RGfeuPRahLhCOrwlyfLNEXNc_DwcI-iHVwxA-e/pub?output=csv";
 
 		public static DateTime trialStartTime;
 
