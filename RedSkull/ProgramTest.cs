@@ -117,66 +117,70 @@ namespace RedSkullShoot
 					Program.lblCountdown.Text = "สถานะโปรแกรม : ไม่ได้รับอนุญาต";
 					Program.lblCountdown.ForeColor = Color.OrangeRed;
 
+					if (r == DialogResult.OK)
+					{
+						Clipboard.SetText(current_uuid_plain);
+						MessageBox.Show("✅ คัดลอกเรียบร้อยแล้ว!\nกำลังเปิด Discord...", "Copied", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
+						try
+						{
+							System.Diagnostics.Process.Start(new ProcessStartInfo
+							{
+								FileName = "https://discord.gg/msHbnzpzTZ",
+								UseShellExecute = true
+							});
+						}
+						catch (Exception ex)
+						{
+							MessageBox.Show("❌ เปิดลิงก์ไม่สำเร็จ: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+						}
+					}
 
-					Program.isTrialMode = true;
-					Program.trialStartTime = DateTime.Now;
 					Program.CheckTrialTime();
 					//Application.Exit();
 					//Environment.Exit(0);
 				}
 				else
 				{
-					Program.isTrialMode = false;
 					Program.lblCountdown.Text = "สถานะโปรแกรม : ได้รับอนุญาต";
 					Program.lblCountdown.ForeColor = Color.Green;
-					if (Program.lblCountdown1 != null)
-					{
-						Program.lblCountdown1.Text = string.Empty;
-					}
 				}
 			}
 		}
 
 		private static void CheckTrialTime()
 		{
-			if (Program.mainForm == null || Program.mainForm.IsDisposed)
+			if (Program.mainForm != null && !Program.mainForm.IsDisposed)
 			{
-				return;
+				if (Program.mainForm.InvokeRequired)
+				{
+					Program.mainForm.Invoke(new Action(CheckTrialTime));
+					return;
+				}
+
+				TimeSpan used = DateTime.Now - Program.trialStartTime;
+				int elapsedSeconds = (int)used.TotalSeconds;
+
+				if (elapsedSeconds >= 180) // 3 นาที = 180 วินาที
+				{
+					Program.countdownTimer.Stop();
+
+					MessageBox.Show(
+						"หมดอายุการทดลองใช้แล้ว\nโปรดติดต่อ Admin เพื่อปลดล็อค",
+						"Trial Expired",
+						MessageBoxButtons.OK,
+						MessageBoxIcon.Warning
+					);
+
+					Application.Exit();
+					Environment.Exit(0);
+				}
+				else
+				{
+					Program.lblCountdown1.Text = $"🕒 ทดลองใช้ไปแล้ว: {elapsedSeconds} วินาที";
+					Program.lblCountdown1.ForeColor = Color.MediumBlue;
+				}
 			}
-			if (Program.mainForm.InvokeRequired)
-			{
-				Program.mainForm.Invoke(new Action(CheckTrialTime));
-				return;
-			}
-			if (Program.lblCountdown1 == null)
-			{
-				return;
-			}
-			if (!Program.isTrialMode)
-			{
-				Program.lblCountdown1.Text = string.Empty;
-				return;
-			}
-			const int trialDurationSeconds = 18; // 3 นาที = 180 วินาที
-			TimeSpan used = DateTime.Now - Program.trialStartTime;
-			int elapsedSeconds = Math.Max(0, (int)used.TotalSeconds);
-			int remainingSeconds = Math.Max(0, trialDurationSeconds - elapsedSeconds);
-			Program.lblCountdown1.Text = $"🕒 ทดลองใช้ไปแล้ว: {elapsedSeconds} วินาที (เหลือ {remainingSeconds} วินาที)";
-			Program.lblCountdown1.ForeColor = (remainingSeconds <= 30) ? Color.OrangeRed : Color.MediumBlue;
-			if (elapsedSeconds < trialDurationSeconds)
-			{
-				return;
-			}
-			Program.countdownTimer?.Stop();
-			MessageBox.Show(
-				"หมดอายุการทดลองใช้แล้ว\nโปรดติดต่อ Admin เพื่อปลดล็อค",
-				"Trial Expired",
-				MessageBoxButtons.OK,
-				MessageBoxIcon.Warning
-			);
-			Application.Exit();
-			Environment.Exit(0);
 		}
 
 
@@ -187,11 +191,9 @@ namespace RedSkullShoot
 			Program.countdownTimer.Interval = 1000;
 			Program.countdownTimer.Tick += delegate(object s, EventArgs e)
 			{
-				Program.CheckTrialTime();
 				Program.UpdateCountdown();
 			};
 			Program.countdownTimer.Start();
-			Program.CheckTrialTime(); // do an initial update right away
 		}
 
 		// Token: 0x0600004A RID: 74 RVA: 0x00002D50 File Offset: 0x00000F50
@@ -4532,9 +4534,6 @@ namespace RedSkullShoot
 
 		// Token: 0x0400002C RID: 44
 		private static System.Windows.Forms.Timer countdownTimer;
-
-		// Token: 0x0400002C RID: 44.1
-		private static bool isTrialMode;
 
 		// Token: 0x0400002D RID: 45
 		private static int redThreshold = 200;
